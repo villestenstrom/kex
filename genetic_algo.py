@@ -12,21 +12,34 @@ def init_population(population_size):
     
 def next_generation(population, data, mutation_rate):
     # Score each individual in the population using the fitness function
-    population_score = []
+    population_score = {}
     for individual in population:
-        population_score.append(formulas.fitness(individual, data))
+        population_score[individual] = formulas.fitness(individual, data)
         
     # Sort the population by their score
-    population = [x for _, x in sorted(zip(population_score, population), key=lambda pair: pair[0], reverse=True)]
-        
-    # Select the top x percent of the population for reproduction
-    top_percent = 0.4
-    top_population = []
-    for i in range(int(len(population) * top_percent)):
-        top_population.append(population[i])
+    population = sorted(population, key=lambda x: population_score[x], reverse=True)
+    
+    best_individual = population[0]
         
     # Create the next generation
+    top_population = []
     new_population = []
+        
+    # Also add the top x percent to the new population without any changes
+    elite_percent = 0.1
+    for i in range(int(len(population) * elite_percent)):
+        new_population.append(population[i])
+        new_population.append(mutate(population[i], mutation_rate))
+        
+    # Pick out pairs of three randomly from the population until all have been selected
+    for _ in range(int(len(population) * 0.8) // 2):
+        # Pick out three and delete them from the population
+        choices = random.sample(population, 3)
+            
+        # Select best one from the three
+        best_choice = max(choices, key=lambda x: population_score[x])
+        top_population.append(best_choice)
+        
     for _ in range(len(top_population)):
         parent1 = random.choice(top_population)
         parent2 = random.choice(top_population)
@@ -34,12 +47,7 @@ def next_generation(population, data, mutation_rate):
         new_population.append(mutate(child1, mutation_rate))
         new_population.append(mutate(child2, mutation_rate))
         
-    # Also add the top x percent to the new population without any changes
-    elite_percent = 0.2
-    for i in range(int(len(population) * elite_percent)):
-        new_population.append(population[i])
-        
-    return new_population, population[0]
+    return new_population, best_individual
 
 def crossover(parent1, parent2):
     from utils import convert_placeholder, revert_placeholder
@@ -112,16 +120,23 @@ def mutate(s, n_percent):
 def main():
     
     print("Genetic Algorithm... Running...")
-
-    population = init_population(100)
     data = [data_handler.relative_letter_frequency(reuters, 'reuters'), data_handler.relative_bigram_frequency(reuters, 'reuters')]
-    mutation_rate = 10
+    mutation_rate = 1
     
-    for i in range(1000):
-        population, best_individual = next_generation(population, data, mutation_rate)
-        print(len(population))
-        score = formulas.fitness(best_individual, data)
-        print(f"====== Generation {i + 1}: {best_individual} - Score: {score} ======")
+    top_individuals = []
+    
+    for _ in range(3):
+        population = init_population(200)
+        for i in range(300):
+            population, best_individual = next_generation(population, data, mutation_rate)
+            score = formulas.fitness(best_individual, data)
+            print(f"====== Generation {i + 1}: {best_individual} - Score: {score} ======")
+        top_individuals.append(best_individual)
+        print(f"Top individual: {best_individual}")
+        
+    print("Top individuals:")
+    for individual in top_individuals:
+        print(individual)
 
 main()
 

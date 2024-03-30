@@ -12,7 +12,16 @@ def workload_distribution_score(layout, data):
     
     score = 0
     for (letter, freq) in data.items():
-        score += (freq - get_workload_dist_at(get_position_of_char(layout, letter)))**2
+        #print("====================================")
+        #print(f"Letter: {letter}")
+        #print(f"Freq: {freq}")
+        #print(f"Position: {get_position_of_char(layout, letter)}")
+        #print(f"Workload Dist: {get_workload_dist_at(get_position_of_char(layout, letter))}")
+        #print(f"Freq - Workload Dist: {freq - get_workload_dist_at(get_position_of_char(layout, letter))}")
+        #print(f"Square: {(freq - get_workload_dist_at(get_position_of_char(layout, letter)))**2}")
+        #print("====================================")
+        freq = freq * 100
+        score += (freq + get_workload_dist_at(get_position_of_char(layout, letter)))**2
     
     return score
 
@@ -24,7 +33,8 @@ def combination_workload_distribution_score(layout, data):
     
     score = 0
     for (bigram, freq) in data.items():
-        score += (freq - get_combination_workload_dist_at(get_position_of_bigram(layout, bigram)))**2
+        freq = freq * 100
+        score += (freq + get_combination_workload_dist_at(get_position_of_bigram(layout, bigram)))**2
     
     return score
 
