@@ -1,0 +1,9 @@
+You feed in the following and you get a list of keyboards out that attempt to match these criterias, then you evaluate them and pick the one that you like the most.
+
+n-grams
+bigrams
+key accessability
+key layout
+word frequency
+hand rolls, (roll ins prefered)
+hand alternation
