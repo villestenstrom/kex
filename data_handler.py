@@ -27,8 +27,7 @@ def most_common_bigrams(corpus, corpus_name, n):
     filtered_bigrams = {k: v for k, v in bg_freq.items() if not(k[0] in [',', '.'] and k[1].isalpha())}
     most_common = Counter(filtered_bigrams).most_common(n)
 
-    for bigram, freq in most_common:
-        print(f"{bigram[0]}{bigram[1]}:{freq}")
+    
 
 def relative_letter_frequency(corpus, corpus_name):
     nltk.download(corpus_name)
@@ -44,11 +43,15 @@ def relative_letter_frequency(corpus, corpus_name):
     # Sort char_freq by the frequency of the characters
     char_freq = {k: v for k, v in sorted(char_freq.items(), key=lambda item: item[1], reverse=True)}
     
-    return char_freq
+    relative_freq = {}
+    for char, freq in char_freq.items():
+        relative_freq[char] = freq / total_chars
+    
+    return relative_freq
 
 
 
-def relative_bigram_frequency(corpus, corpus_name):
+def relative_bigram_frequency2(corpus, corpus_name):
     nltk.download(corpus_name)
     nltk.download('punkt')
     
@@ -67,7 +70,6 @@ def relative_bigram_frequency(corpus, corpus_name):
     
     # Remove instances where a comma or period comes before a comma or period
     cleaned_text = re.sub(r'[,.]{2,}', '', cleaned_text)
-    print(cleaned_text)
 
     # Generate bigrams
     bg = bigrams(cleaned_text)
@@ -94,33 +96,52 @@ def sum_values_in_df(df):
 def get_frequency_of_bigram(df, first, second):
     return df.at[second, first]
 
+#df = relative_bigram_frequency2(brown, 'brown')
+#print(get_frequency_of_bigram(df, 't', 'h'))
+#print(get_frequency_of_bigram(df, 'l', 't'))
 
-# Example usage
-corpus = reuters
+def relative_bigram_frequency(corpus, corpus_name):
+    nltk.download(corpus_name)
+    nltk.download('punkt')
+    
+    # Prepare the text
+    words = corpus.words()
+    text = " ".join(words).lower()
+    
+    # Remove non-alphabetic characters (except for commas, periods, and spaces)
+    cleaned_text = re.sub(r'[^a-z,.\' ]', '', text)
+    
+    # Remove spaces before commas and periods
+    cleaned_text = re.sub(r' [,.]', '', cleaned_text)
+    
+    # Remove spaces before and after apostrophes
+    cleaned_text = re.sub(r' \' ', '\'', cleaned_text)
+    
+    # Remove instances where a comma or period comes before a comma or period
+    cleaned_text = re.sub(r'[,.]{2,}', '', cleaned_text)
 
-# Get the name of the corpus
-corpus_name = corpus.__name__
-print(f"Corpus: {corpus_name}")
+    # Generate character bigrams as tuples
+    bigrams = [(cleaned_text[i], cleaned_text[i+1]) for i in range(len(cleaned_text)-1)]
+    
+    # Calculate frequencies of bigrams
+    bigram_freq = Counter(bigrams)
 
-print("Most Common Bigrams:")
-most_common_bigrams(corpus, corpus_name, 1000)
-print("\nRelative Frequency of Letters, Comma, and Period:")
-relative_letter_frequency(corpus, corpus_name)
-print("\nMost Common Bigrams Relative Frequency:")
-df = relative_bigram_frequency(corpus, corpus_name)
-print(df)   # Returns a DataFrame
-print("\nSum of Values in DataFrame:")
-print(sum_values_in_df(df))
-print("\nFrequency of Bigrams:")
-print('th: ', get_frequency_of_bigram(df, 't', 'h'))
-print('er: ', get_frequency_of_bigram(df, 'e', 'r'))
-print('an: ', get_frequency_of_bigram(df, 'a', 'n'))
-print('in: ', get_frequency_of_bigram(df, 'i', 'n'))
-print('re: ', get_frequency_of_bigram(df, 'r', 'e'))
-print('on: ', get_frequency_of_bigram(df, 'o', 'n'))
-print('..: ', get_frequency_of_bigram(df, '.', '.'))
-print(',,: ', get_frequency_of_bigram(df, ',', ','))
-print('a,: ', get_frequency_of_bigram(df, 'a', ','))
-print(',a: ', get_frequency_of_bigram(df, '.', 'a'))
-print('s,: ', get_frequency_of_bigram(df, 's', ','))
-print(',s: ', get_frequency_of_bigram(df, ',', 's'))
+    # Filter out bigrams that contain spaces
+    bigram_freq = {k: v for k, v in bigram_freq.items() if ' ' not in k[0] and ' ' not in k[1]}
+
+    # Calculate total number of bigrams for normalization
+    total_bigrams = sum(bigram_freq.values())
+
+    # Calculate relative frequencies
+    bigram_rel_freq = {k: round(v / total_bigrams, 4) for k, v in bigram_freq.items()}
+    
+    # Sort bigram_rel_freq by frequency
+    bigram_rel_freq = {k: v for k, v in sorted(bigram_rel_freq.items(), key=lambda item: item[1], reverse=True)}
+
+    return bigram_rel_freq
+
+#corpus = brown
+#corpus_name = 'brown'
+#bigram_freq = relative_bigram_frequency(corpus, corpus_name)
+#print(bigram_freq)
+
