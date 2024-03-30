@@ -30,7 +30,7 @@ def most_common_bigrams(corpus, corpus_name, n):
     for bigram, freq in most_common:
         print(f"{bigram[0]}{bigram[1]}:{freq}")
 
-def relative_frequency(corpus, corpus_name):
+def relative_letter_frequency(corpus, corpus_name):
     nltk.download(corpus_name)
     nltk.download('punkt')
 
@@ -43,13 +43,12 @@ def relative_frequency(corpus, corpus_name):
     
     # Sort char_freq by the frequency of the characters
     char_freq = {k: v for k, v in sorted(char_freq.items(), key=lambda item: item[1], reverse=True)}
-
-    for char, freq in char_freq.items():
-        print(f"{char}: {freq / total_chars:.4f}")
-
+    
+    return char_freq
 
 
-def most_common_bigrams_relative(corpus, corpus_name):
+
+def relative_bigram_frequency(corpus, corpus_name):
     nltk.download(corpus_name)
     nltk.download('punkt')
     
@@ -106,9 +105,9 @@ print(f"Corpus: {corpus_name}")
 print("Most Common Bigrams:")
 most_common_bigrams(corpus, corpus_name, 1000)
 print("\nRelative Frequency of Letters, Comma, and Period:")
-relative_frequency(corpus, corpus_name)
+relative_letter_frequency(corpus, corpus_name)
 print("\nMost Common Bigrams Relative Frequency:")
-df = most_common_bigrams_relative(corpus, corpus_name)
+df = relative_bigram_frequency(corpus, corpus_name)
 print(df)   # Returns a DataFrame
 print("\nSum of Values in DataFrame:")
 print(sum_values_in_df(df))

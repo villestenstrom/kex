@@ -71,10 +71,12 @@ def generate_combination_workload_dist(keymap, penalty_map):
     # 3. Finger placements:
     # 3.1 P_one_over_R
     # 3.2 P_two_over_R
-    # 3.2 R_one_over_M
-    # 3.3 R_two_over_M
-    # 3.4 I_one_over_M
-    # 3.5 I_two_over_M
+    # 3.3 P_one_over_M
+    # 3.4 P_two_over_M
+    # 3.5 R_one_over_M
+    # 3.6 R_two_over_M
+    # 3.7 I_one_over_M
+    # 3.8 I_two_over_M
     # 4. At least one finger not on home row
     # 5. One finger on top row and one finger on bottom row
     # 6. Hand movement (reaching with index finger to b causes rest of fingers to move compared to reaching for y)
@@ -83,11 +85,154 @@ def generate_combination_workload_dist(keymap, penalty_map):
     # We store all penalties in a dictionary accessible by the penalty name
     # For example the key positions penalty would have the key be the key id and the value be the penalty value for that key
     
-    for (key, value) in keymap:
-        for penalty in penalty_map:
-            pass
+    workload_distribution_map = {}
     
-    pass
+    def determine_transition_classification(first_key, second_key, first_value, second_value, penalty_map):
+        transition_classification = []
+        first_value = int(first_value)
+        second_value = int(second_value)
+        penalty_map_keys = list(penalty_map.keys())
+        
+        # Check if both or on same hand
+        if (first_value <= 4 and second_value <= 4):
+            
+            # Rollin
+            if (first_value < second_value):
+                transition_classification.append(penalty_map_keys[0])
+                
+            # Rollout
+            elif (first_value > second_value):
+                transition_classification.append(penalty_map_keys[1])
+                
+            # At least one finger not on home row
+            if (first_key[0] != '2' and second_key[0] != '2'):
+                transition_classification.append(penalty_map_keys[11])
+                
+            # One finger on top row and one finger on bottom row
+            if (first_key[0] == '1' and second_key[0] == '3') or (first_key[0] == '3' and second_key[0] == '1'):
+                transition_classification.append(penalty_map_keys[12])
+                
+        elif (first_value >= 5 and second_value >= 5):
+            
+            # Rollin
+            if (first_value > second_value):
+                transition_classification.append(penalty_map_keys[0])
+                
+            # Rollout
+            elif (first_value < second_value):
+                transition_classification.append(penalty_map_keys[1])
+                
+            # At least one finger not on home row
+            if (first_key[0] != '2' and second_key[0] != '2'):
+                transition_classification.append(penalty_map_keys[11])
+                
+            # One finger on top row and one finger on bottom row
+            if (first_key[0] == '1' and second_key[0] == '3') or (first_key[0] == '3' and second_key[0] == '1'):
+                transition_classification.append(penalty_map_keys[12])
+                
+        # Same finger twice (non-repeating characters)
+        if (first_value == second_value) and (first_key != second_key):
+            transition_classification.append(penalty_map_keys[10])
+            
+        # Finger placements (left hand)
+        # P_over_R
+        if (first_value == 1 and second_value == 2):
+            # P_one_over_R
+            if (first_key[0] == '1' and second_key[0] == '2'):
+                transition_classification.append(penalty_map_keys[2])
+            
+            # P_two_over_R
+            if (first_key[0] == '1' and second_key[0] == '3'):
+                transition_classification.append(penalty_map_keys[3])
+                
+        # P_over_M
+        if (first_value == 1 and second_value == 3):
+            # P_one_over_M
+            if (first_key[0] == '1' and second_key[0] == '2'):
+                transition_classification.append(penalty_map_keys[4])
+            
+            # P_two_over_M
+            if (first_key[0] == '1' and second_key[0] == '3'):
+                transition_classification.append(penalty_map_keys[5])
+                
+        # R_over_M
+        if (first_value == 2 and second_value == 3):
+            # R_one_over_M
+            if (first_key[0] == '1' and second_key[0] == '2'):
+                transition_classification.append(penalty_map_keys[6])
+            
+            # R_two_over_M
+            if (first_key[0] == '1' and second_key[0] == '3'):
+                transition_classification.append(penalty_map_keys[7])
+                
+        # I_over_M
+        if (first_value == 4 and second_value == 3):
+            # I_one_over_M
+            if (first_key[0] == '1' and second_key[0] == '2'):
+                transition_classification.append(penalty_map_keys[8])
+            
+            # I_two_over_M
+            if (first_key[0] == '1' and second_key[0] == '3'):
+                transition_classification.append(penalty_map_keys[9])
+                
+        # Right hand
+        # P_over_R
+        if (first_value == 8 and second_value == 7):
+            # P_one_over_R
+            if (first_key[0] == '1' and second_key[0] == '2'):
+                transition_classification.append(penalty_map_keys[2])
+            
+            # P_two_over_R
+            if (first_key[0] == '1' and second_key[0] == '3'):
+                transition_classification.append(penalty_map_keys[3])
+        
+        # P_over_M
+        if (first_value == 8 and second_value == 6):
+            # P_one_over_M
+            if (first_key[0] == '1' and second_key[0] == '2'):
+                transition_classification.append(penalty_map_keys[4])
+            
+            # P_two_over_M
+            if (first_key[0] == '1' and second_key[0] == '3'):
+                transition_classification.append(penalty_map_keys[5])
+                
+        # R_over_M
+        if (first_value == 7 and second_value == 6):
+            # R_one_over_M
+            if (first_key[0] == '1' and second_key[0] == '2'):
+                transition_classification.append(penalty_map_keys[6])
+            
+            # R_two_over_M
+            if (first_key[0] == '1' and second_key[0] == '3'):
+                transition_classification.append(penalty_map_keys[7])
+                
+        # I_over_M
+        if (first_value == 5 and second_value == 6):
+            # I_one_over_M
+            if (first_key[0] == '1' and second_key[0] == '2'):
+                transition_classification.append(penalty_map_keys[8])
+            
+            # I_two_over_M
+            if (first_key[0] == '1' and second_key[0] == '3'):
+                transition_classification.append(penalty_map_keys[9])
+        
+        return transition_classification
+    
+    for (first_key, first_value) in keymap:
+        for (second_key, second_value) in keymap:
+            transition_classification = determine_transition_classification(first_key, second_key, first_value, second_value, penalty_map)
+            W_list = []
+            W = 4
+            for transition in transition_classification:
+                penalty = penalty_map[transition]
+                W = W * penalty
+                
+            W = round(W, 4)
+            W_list.append(W)
+            W_list.append(transition_classification)
+            workload_distribution_map[(first_key, second_key)] = W
+    
+    return workload_distribution_map
 
 # Keymap would consist of the following:
 # Dictionary of key-value pairs where the key is the id of the key and the value is the finger that presses the key
@@ -116,20 +261,30 @@ penalty_map_1 = {
     }
 }
 
+default_penalty = 0.8
+
 penalty_map_2 = {
-    'key_positions': {
-        '11': 0, '12': 0, '13': 0, '14': 0, '15': 0, '16': 0, '17': 0, '18': 0, '19': 0, '110': 0, '111': 0,
-        '21': 0, '22': 0, '23': 0, '24': 0, '25': 0, '26': 0, '27': 0, '28': 0, '29': 0, '210': 0, '211': 0,
-        '31': 0, '32': 0, '33': 0, '34': 0, '35': 0, '36': 0, '37': 0, '38': 0, '39': 0, '310': 0, '311': 0,
-    },
-    'key_transitions': {
-        '11': 0, '12': 0, '13': 0, '14': 0, '15': 0, '16': 0, '17': 0, '18': 0, '19': 0, '110': 0, '111': 0,
-        '21': 0, '22': 0, '23': 0, '24': 0, '25': 0, '26': 0, '27': 0, '28': 0, '29': 0, '210': 0, '211': 0,
-        '31': 0, '32': 0, '33': 0, '34': 0, '35': 0, '36': 0, '37': 0, '38': 0, '39': 0, '310': 0, '311': 0,
-    }
+    'rollin': 1.1, 
+    'rollout': default_penalty,
+    'P_one_over_R': default_penalty, 
+    'P_two_over_R': default_penalty - 0.1,
+    'P_one_over_M': default_penalty,
+    'P_two_over_M': default_penalty - 0.1,
+    'R_one_over_M': default_penalty,
+    'R_two_over_M': default_penalty - 0.1,
+    'I_one_over_M': default_penalty,
+    'I_two_over_M': default_penalty - 0.1,
+    'same_finger_twice': default_penalty - 0.2,
+    'at_least_one_finger_not_on_home_row': default_penalty,
+    'one_finger_on_top_row_and_one_finger_on_bottom_row': default_penalty,
+    'hand_movement': default_penalty
 }
 
 # Run
 workload_dist = generate_workload_dist(keymap.items(), penalty_map_1)
 
 print(workload_dist)
+
+combination_workload_dist = generate_combination_workload_dist(keymap.items(), penalty_map_2)
+
+print(combination_workload_dist)
