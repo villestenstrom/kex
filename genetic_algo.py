@@ -29,10 +29,10 @@ def next_generation(population, data, mutation_rate):
     elite_percent = 0.1
     for i in range(int(len(population) * elite_percent)):
         new_population.append(population[i])
-        new_population.append(mutate(population[i], mutation_rate))
+        #new_population.append(mutate(population[i], mutation_rate))
         
     # Pick out pairs of three randomly from the population until all have been selected
-    for _ in range(int(len(population) * 0.8) // 2):
+    for _ in range(int(len(population) * (1 - elite_percent)) // 2):
         # Pick out three and delete them from the population
         choices = random.sample(population, 3)
             
@@ -125,9 +125,10 @@ def main():
     
     top_individuals = []
     
-    for _ in range(3):
-        population = init_population(200)
-        for i in range(300):
+    
+    for _ in range(20):
+        population = init_population(20)
+        for i in range(200):
             population, best_individual = next_generation(population, data, mutation_rate)
             score = formulas.fitness(best_individual, data)
             print(f"====== Generation {i + 1}: {best_individual} - Score: {score} ======")
@@ -137,6 +138,13 @@ def main():
     print("Top individuals:")
     for individual in top_individuals:
         print(individual)
+        
+    population = top_individuals
+    for i in range(500):
+        population, best_individual = next_generation(population, data, mutation_rate)
+        score = formulas.fitness(best_individual, data)
+        print(f"====== Generation {i + 1}: {best_individual} - Score: {score} ======")
+        
 
 main()
 

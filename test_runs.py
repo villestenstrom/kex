@@ -70,7 +70,10 @@ show_layout(layout)
 test_layouts = [
     'qwertyuiop_asdfghjkl_\'_zxcvbnm,._',
     'qwfpbjluy_\'arstgkneio_zxcdv_mh,._',
-    "bdl,__.fyq_irnscmteaovpwhu_'gkjzx"
+    "bdl,__.fyq_irnscmteaovpwhu_'gkjzx",
+    "bcl.,_qdfx_nrsihyteaopmwgu__vj'kz",
+    "bcl.,'xdyq_isnrhpaetofmgwu__v_zjk",
+    "wdl,__qhfx_iseacmtrnoygbpu'_.vzjk"
 ]
     
 data = [data_handler.relative_letter_frequency(reuters, 'reuters'), data_handler.relative_bigram_frequency(reuters, 'reuters')]

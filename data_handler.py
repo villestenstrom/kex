@@ -5,6 +5,7 @@ from collections import Counter
 import re
 import pandas as pd
 import numpy as np
+import csv
 
 def most_common_bigrams(corpus, corpus_name, n):
     nltk.download(corpus_name)
@@ -142,6 +143,34 @@ def relative_bigram_frequency(corpus, corpus_name):
 
 #corpus = brown
 #corpus_name = 'brown'
-#bigram_freq = relative_bigram_frequency(corpus, corpus_name)
+#bigram_freq = relative_letter_frequency(corpus, corpus_name)
 #print(bigram_freq)
+from tqdm import tqdm
+
+def relative_letter_frequency_csv(filename):
+    text = ""
+    with open(filename, 'r') as file:
+        reader = csv.reader(file)
+        for row in tqdm(reader, desc="Processing CSV file"):
+            word, count = row
+            text += word.lower() * int(count)
+
+    cleaned_text = re.sub(r'[^a-z]', '', text)
+
+    total_chars = len(cleaned_text)
+    char_freq = Counter(cleaned_text)
+
+    # Sort char_freq by the frequency of the characters
+    char_freq = {k: v for k, v in sorted(char_freq.items(), key=lambda item: item[1], reverse=True)}
+
+    relative_freq = {}
+    for char, freq in char_freq.items():
+        relative_freq[char] = freq / total_chars
+
+    return relative_freq
+
+#csv_file_test = "test_data.csv"
+#csv_file = "unigram_freq.csv"
+#freq = relative_letter_frequency_csv(csv_file)
+#print(freq)
 
